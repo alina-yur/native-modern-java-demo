@@ -1,14 +1,18 @@
 package dev.nipafx.demo.modern.operations;
 
+import com.sun.net.httpserver.SimpleFileServer;
+import com.sun.net.httpserver.SimpleFileServer.OutputLevel;
 import dev.nipafx.demo.modern.page.GitHubPage;
 import dev.nipafx.demo.modern.page.Page;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
+import static dev.nipafx.demo.modern.Util.asHTML;
 import static dev.nipafx.demo.modern.Util.join;
 import static java.lang.StringTemplate.RAW;
 import static java.util.stream.Collectors.joining;
@@ -19,8 +23,7 @@ public class ResultServer {
 		if (!Files.exists(serverDir))
 			Files.createDirectory(serverDir);
 
-		// TODO: parse to HTML document
-		var html = join(RAW."""
+		var html = asHTML(RAW."""
 				<!DOCTYPE html>
 				<html lang="en">
 					<head>
@@ -35,7 +38,14 @@ public class ResultServer {
 					</body>
 				</html>
 				""");
-		Files.writeString(serverDir.resolve("index.html"), html);
+		Files.writeString(serverDir.resolve("index.html"), html.html());
+
+		launchWebServer(serverDir);
+	}
+
+	private static void launchWebServer(Path serverDir) {
+		System.out.println("Visit localhost:8080");
+		// TODO: launch web server
 	}
 
 	private static String pageTreeHtml(Page rootPage) {
@@ -64,10 +74,10 @@ public class ResultServer {
 	}
 
 	private static String pageHtml(Page page, boolean reference, int level) {
-		// TODO: add page info
 		return join(RAW."""
-				<div class="page level-0">
-					<a href=""></a>
+				<div class="page level-\{level}">
+					<a href="\{page.url().toString()}">\{Pretty.pageName(page)}</a>
+					\{reference ? "<span class=\"ref\"></span>" : ""}
 				</div>
 				""");
 	}

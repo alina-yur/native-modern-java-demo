@@ -4,31 +4,14 @@ A repository for my live-coding talk [Modern Java in Action](https://nipafx.dev/
 
 ## Next
 
-String templates:
-* change output in `GitHubCrawl::main` to:
+Simple server:
+* `ResultServer::launchWebServer`:
 	```java
-	System.out.println(join(RAW."""
-
-			---
-
-			\{Statistician.evaluate(rootPage)}
-
-			\{Pretty.pageList(rootPage)}
-
-			"""));
-	```
-* add info in `ResultServer::pageHtml`:
-	```java
-	return join(RAW."""
-			<div class="page level-\{level}">
-				<a href="\{page.url().toString()}">\{Pretty.pageName(page)}</a>
-				\{reference ? "<span class=\"ref\"></span>" : ""}
-			</div>
-			""");
-	```
-* add `Util::asHTML` and use in `ResultServer::serve`:
-	```java
-	public static Document asHTML(StringTemplate stringTemplate) {
-		return Jsoup.parse(stringTemplate.interpolate());
-	}
+	System.out.println("Visit localhost:8080");
+	SimpleFileServer
+			.createFileServer(
+					new InetSocketAddress(8080),
+					serverDir.toAbsolutePath(),
+					OutputLevel.INFO)
+			.start();
 	```
