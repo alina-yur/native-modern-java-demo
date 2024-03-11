@@ -2,6 +2,7 @@ package dev.nipafx.demo.modern;
 
 import dev.nipafx.demo.modern.crawler.PageTreeFactory;
 import dev.nipafx.demo.modern.operations.Pretty;
+import dev.nipafx.demo.modern.operations.ResultServer;
 import dev.nipafx.demo.modern.operations.Statistician;
 import dev.nipafx.demo.modern.page.ExternalPage;
 import dev.nipafx.demo.modern.page.GitHubIssuePage;
@@ -10,7 +11,11 @@ import dev.nipafx.demo.modern.page.GitHubPrPage;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
+import java.nio.file.Path;
 import java.util.Set;
+
+import static dev.nipafx.demo.modern.Util.join;
+import static java.lang.StringTemplate.RAW;
 
 public class GitHubCrawl {
 
@@ -24,13 +29,15 @@ public class GitHubCrawl {
 		System.out.printf("%nTo see virtual threads in action, run this while the app is resolving a bunch of links:%n");
 		System.out.printf("jcmd %s Thread.dump_to_file -format=json -overwrite threads.json%n%n", ProcessHandle.current().pid());
 
-		// TODO
-		var client = (HttpClient) null;
+		var client = HttpClient.newHttpClient();
 		var factory = new PageTreeFactory(client);
 		var rootPage = factory.createPage(config.seedUrl(), config.depth());
 
+		// TODO: improve formatting
 		System.out.println(Statistician.evaluate(rootPage));
 		System.out.println(Pretty.pageList(rootPage));
+
+		ResultServer.serve(rootPage, Path.of("serve"));
 	}
 
 	private record Configuration(URI seedUrl, int depth) {

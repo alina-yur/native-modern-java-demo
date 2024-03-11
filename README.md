@@ -4,51 +4,31 @@ A repository for my live-coding talk [Modern Java in Action](https://nipafx.dev/
 
 ## Next
 
-Records:
-* create `record PageWithLinks(Page page, Set<URI> links)`
-	* additional constructor without `links`
-
-Modules:
-* fix errors in `PageFactory`: `requires org.jsoup;`
-* fix errors in `PageTreeFactory`: `requires java.net.http;`
-
-HTTP client:
-* instantiate `HttpClient` in `GitHubCrawl`:
+String templates:
+* change output in `GitHubCrawl::main` to:
 	```java
-	var client = HttpClient.newHttpClient();
+	System.out.println(join(RAW."""
+
+			---
+
+			\{Statistician.evaluate(rootPage)}
+
+			\{Pretty.pageList(rootPage)}
+
+			"""));
 	```
-* `PageTreeFactory::fetchPageAsString`:
+* add info in `ResultServer::pageHtml`:
 	```java
-	var request = HttpRequest
-	  .newBuilder(url)
-	  .GET()
-	  .build();
-	return client
-	  .send(request, BodyHandlers.ofString())
-	  .body();
+	return join(RAW."""
+			<div class="page level-\{level}">
+				<a href="\{page.url().toString()}">\{Pretty.pageName(page)}</a>
+				\{reference ? "<span class=\"ref\"></span>" : ""}
+			</div>
+			""");
 	```
-
-Structured Concurrency:
-* `PageTreeFactory::resolveLinks`:
+* add `Util::asHTML` and use in `ResultServer::serve`:
 	```java
-	try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-	  var futurePages = new ArrayList<Subtask<Page>>();
-	  for (URI link : links)
-		  futurePages.add(scope.fork(() -> createPage(link, depth)));
-
-	  scope.join();
-	  scope.throwIfFailed();
-
-	  return futurePages.stream()
-			  .map(Subtask::get)
-			  .collect(toSet());
-	} catch (ExecutionException ex) {
-	  // this should not happen as `ErrorPage` instances should have been created for all errors
-	  throw new IllegalStateException("Error cases should have been handled during page creation!", ex);
+	public static Document asHTML(StringTemplate stringTemplate) {
+		return Jsoup.parse(stringTemplate.interpolate());
 	}
 	```
-
-Run:
-* add breakpoint for issue #740
-* run with arguments `https://github.com/junit-pioneer/junit-pioneer/issues/624 10`
-* create and show thread dump
