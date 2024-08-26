@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.util.Set;
 
 import static dev.nipafx.demo.modern.Util.join;
-import static java.lang.StringTemplate.RAW;
 
 public class GitHubCrawl {
 
@@ -26,22 +25,23 @@ public class GitHubCrawl {
 	public static void main(String[] args) throws Exception {
 		var config = Configuration.parse(args);
 
-		System.out.printf("%nTo see virtual threads in action, run this while the app is resolving a bunch of links:%n");
-		System.out.printf("jcmd %s Thread.dump_to_file -format=json -overwrite threads.json%n%n", ProcessHandle.current().pid());
+		System.out
+				.printf("%nTo see virtual threads in action, run this while the app is resolving a bunch of links:%n");
+		System.out.printf("jcmd %s Thread.dump_to_file -format=json -overwrite threads.json%n%n",
+				ProcessHandle.current().pid());
 
 		var client = HttpClient.newHttpClient();
 		var factory = new PageTreeFactory(client);
 		var rootPage = factory.createPage(config.seedUrl(), config.depth());
 
-		System.out.println(join(RAW."""
-
+		System.out.println(String.format("""
 				---
 
-				\{Statistician.evaluate(rootPage)}
+				%s
 
-				\{Pretty.pageList(rootPage)}
+				%s
 
-				"""));
+				""", Statistician.evaluate(rootPage), Pretty.pageList(rootPage)));
 
 		ResultServer.serve(rootPage, Path.of("serve"));
 	}

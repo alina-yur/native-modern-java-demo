@@ -14,7 +14,6 @@ import java.util.Set;
 
 import static dev.nipafx.demo.modern.Util.asHTML;
 import static dev.nipafx.demo.modern.Util.join;
-import static java.lang.StringTemplate.RAW;
 import static java.util.stream.Collectors.joining;
 
 public class ResultServer {
@@ -23,21 +22,21 @@ public class ResultServer {
 		if (!Files.exists(serverDir))
 			Files.createDirectory(serverDir);
 
-		var html = asHTML(RAW."""
+		var html = asHTML(String.format("""
 				<!DOCTYPE html>
 				<html lang="en">
-					<head>
-						<meta charset="utf-8">
-						<title>\{Pretty.pageName(rootPage)}</title>
-						<link rel="stylesheet" href="style.css">
-					</head>
-					<body>
-						<div class="container">
-							\{pageTreeHtml(rootPage)}
-						</div>
-					</body>
+				    <head>
+				        <meta charset="utf-8">
+				        <title>%s</title>
+				        <link rel="stylesheet" href="style.css">
+				    </head>
+				    <body>
+				        <div class="container">
+				            %s
+				        </div>
+				    </body>
 				</html>
-				""");
+				""", Pretty.pageName(rootPage), pageTreeHtml(rootPage)));
 		Files.writeString(serverDir.resolve("index.html"), html.html());
 
 		launchWebServer(serverDir);
@@ -45,14 +44,12 @@ public class ResultServer {
 
 	private static void launchWebServer(Path serverDir) {
 		System.out.println("Visit localhost:8080");
-		// TODO: launch web server
-		new Thread(() ->
-				SimpleFileServer
-						.createFileServer(
-								new InetSocketAddress(8080),
-								serverDir.toAbsolutePath(),
-								OutputLevel.INFO)
-						.start())
+		new Thread(() -> SimpleFileServer
+				.createFileServer(
+						new InetSocketAddress(8080),
+						serverDir.toAbsolutePath(),
+						OutputLevel.INFO)
+				.start())
 				.start();
 	}
 
@@ -74,20 +71,23 @@ public class ResultServer {
 							.map(linkedPage -> appendPageTreeHtml(printedPages, linkedPage, level + 1))
 							.collect(joining("\n"))
 					: "";
-			return join(RAW."""
-					\{pageHtml}
-					\{descendantsHtml}
-					""");
+			return String.format("""
+					%s
+					%s
+					""", pageHtml, descendantsHtml);
 		}
 	}
 
 	private static String pageHtml(Page page, boolean reference, int level) {
-		return join(RAW."""
-				<div class="page level-\{level}">
-					<a href="\{page.url().toString()}">\{Pretty.pageName(page)}</a>
-					\{reference ? "<span class=\"ref\"></span>" : ""}
+		return String.format("""
+				<div class="page level-%d">
+				    <a href="%s">%s</a>
+				    %s
 				</div>
-				""");
+				""",
+				level,
+				page.url().toString(),
+				Pretty.pageName(page),
+				reference ? "<span class=\"ref\"></span>" : "");
 	}
-
 }

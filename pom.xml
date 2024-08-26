@@ -9,7 +9,7 @@
 	<version>1.0-SNAPSHOT</version>
 
 	<properties>
-		<maven.compiler.release>22</maven.compiler.release>
+		<maven.compiler.release>23</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -38,6 +38,8 @@
 				<version>3.3.0</version>
 				<configuration>
 					<finalName>gh-crawler</finalName>
+					<release>23</release>
+        			<compilerArgs>--enable-preview</compilerArgs>
 					<archive>
 						<manifest>
 							<mainClass>dev.nipafx.demo.modern.GitHubCrawl</mainClass>
@@ -57,7 +59,7 @@
 			  <plugin>
 				<groupId>org.graalvm.buildtools</groupId>
 				<artifactId>native-maven-plugin</artifactId>
-				<version>0.10.1</version>
+				<version>0.10.2</version>
 				<extensions>true</extensions>
 				<executions>
 				  <execution>
