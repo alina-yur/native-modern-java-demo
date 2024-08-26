@@ -4,9 +4,6 @@ import dev.nipafx.demo.modern.crawler.PageTreeFactory;
 import dev.nipafx.demo.modern.operations.Pretty;
 import dev.nipafx.demo.modern.operations.ResultServer;
 import dev.nipafx.demo.modern.operations.Statistician;
-import dev.nipafx.demo.modern.page.ExternalPage;
-import dev.nipafx.demo.modern.page.GitHubIssuePage;
-import dev.nipafx.demo.modern.page.GitHubPrPage;
 
 import java.net.URI;
 import java.net.URISyntaxException;

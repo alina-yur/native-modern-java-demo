@@ -49,3 +49,4 @@ threads.json
 
 # app
 serve/index.html
+jars/*
