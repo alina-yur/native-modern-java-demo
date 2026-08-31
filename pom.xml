@@ -9,7 +9,7 @@
 	<version>1.0-SNAPSHOT</version>
 
 	<properties>
-		<maven.compiler.release>23</maven.compiler.release>
+		<maven.compiler.release>25</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -17,16 +17,17 @@
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.17.2</version>
+			<version>1.23.2</version>
 		</dependency>
 	</dependencies>
 
 	<build>
+		<finalName>gh-crawler</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.6.1</version>
+				<version>3.11.0</version>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
@@ -43,7 +44,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.12.1</version>
+				<version>3.15.0</version>
 				<configuration>
 					<fork>true</fork>
 					<enablePreview>true</enablePreview>
@@ -52,11 +53,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>3.5.1</version>
 				<configuration>
-					<finalName>gh-crawler</finalName>
-					<release>23</release>
-        			<compilerArgs>--enable-preview</compilerArgs>
 					<archive>
 						<manifest>
 							<mainClass>dev.nipafx.demo.modern.GitHubCrawl</mainClass>
@@ -76,7 +74,7 @@
 			  <plugin>
 				<groupId>org.graalvm.buildtools</groupId>
 				<artifactId>native-maven-plugin</artifactId>
-				<version>0.10.2</version>
+				<version>1.1.11</version>
 				<extensions>true</extensions>
 				<executions>
 				  <execution>
@@ -95,10 +93,10 @@
 				  </execution>
 				</executions>
 				<configuration>
-                    <buildArgs>
-                        <buildArg>--enable-preview</buildArg>
-                    </buildArgs>
-					<imageName>native-modern-java</imageName>	
+					<buildArgs>
+						<buildArg>--enable-preview</buildArg>
+					</buildArgs>
+					<imageName>native-modern-java</imageName>
 				</configuration>
 			  </plugin>
 			</plugins>

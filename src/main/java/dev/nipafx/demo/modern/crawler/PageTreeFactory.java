@@ -11,13 +11,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.StructuredTaskScope;
+import java.util.concurrent.StructuredTaskScope.FailedException;
+import java.util.concurrent.StructuredTaskScope.Joiner;
 import java.util.concurrent.StructuredTaskScope.Subtask;
 
 import static java.util.Objects.requireNonNull;
@@ -79,18 +79,14 @@ public class PageTreeFactory {
 		if (depth < 0)
 			return Collections.emptySet();
 
-		try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-			var futurePages = new ArrayList<Subtask<Page>>();
+		try (var scope = StructuredTaskScope.open(Joiner.<Page>allSuccessfulOrThrow())) {
 			for (URI link : links)
-				futurePages.add(scope.fork(() -> createPage(link, depth)));
+				scope.fork(() -> createPage(link, depth));
 
-			scope.join();
-			scope.throwIfFailed();
-
-			return futurePages.stream()
+			return scope.join()
 					.map(Subtask::get)
 					.collect(toSet());
-		} catch (ExecutionException ex) {
+		} catch (FailedException ex) {
 			// this should not happen as `ErrorPage` instances should have been created for all errors
 			throw new IllegalStateException("Error cases should have been handled during page creation!", ex);
 		}
